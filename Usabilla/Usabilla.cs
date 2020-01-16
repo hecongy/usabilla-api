@@ -375,7 +375,10 @@ namespace Usabilla
             if (iterate)
                 return ItemIterator(url);
             else
-                return new List<dynamic> { SendSignedRequest(url) };
+            {
+                var result = SendSignedRequest(url);
+                return result.items;
+            }
         }
 
         /// <summary>
