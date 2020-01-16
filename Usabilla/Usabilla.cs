@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -139,6 +140,7 @@ namespace Usabilla
         private string mHostProtocol = "https://";
         public Credentials Credentials { get; set; }
         public string QueryParameters { get; set; }
+        public Dictionary<string, Dictionary<string, Dictionary<string, string>>> Resource { get; set; }
 
         /// <summary>
         /// Initialize an APIClient object
@@ -149,6 +151,44 @@ namespace Usabilla
         {
             QueryParameters = "";
             Credentials = new Credentials(clientKey, secretKey);
+
+            // Construct scope, product and resource
+            Resource = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>
+            {
+                { "live",
+                    new Dictionary<string, Dictionary<string, string>>
+                    {
+                        { "websites",
+                            new Dictionary<string, string>
+                            {
+                                { "button","/button"},
+                                { "feedback","/button/:id/feedback"},
+                                { "campaign","/campaign"},
+                                { "campaign_result","/campaign/:id/results"},
+                                { "campaign_stats","/campaign/:id/stats"},
+                                { "inpage","/inpage"},
+                                { "inpage_result","/inpage/:id/feedback"}
+                            }
+                        },
+                        { "email",
+                            new Dictionary<string, string>
+                            {
+                                { "button","/button"},
+                                { "feedback","/button/:id/feedback"}
+                            }
+                        },
+                        { "apps",
+                            new Dictionary<string, string>
+                            {
+                                { "app",""},
+                                { "feedback","/button/:id/feedback"},
+                                { "campaign","/campaign"},
+                                { "campaign_result","/campaign/:id/results"}
+                            }
+                        },
+                    }
+                }
+            };
         }
 
         /// <summary>
@@ -194,7 +234,7 @@ namespace Usabilla
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public string SendSignedRequest(string scope)
+        public dynamic SendSignedRequest(string scope)
         {
             /**
              * The process is the following:
@@ -254,7 +294,88 @@ namespace Usabilla
             var requestUrl = $"{mHostProtocol}{mHost}{scope}?{canonicalQueryString}";
             var response = httpClient.GetAsync(requestUrl).Result;
 
-            return response.Content.ReadAsStringAsync().Result;
+            var body = response.Content.ReadAsStringAsync().Result;
+
+            return JsonConvert.DeserializeObject(body);
+        }
+
+        /// <summary>
+        /// Checks whether the resource exists
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="product"></param>
+        /// <param name="resource"></param>
+        /// <returns></returns>
+        public string CheckResourceValidity(string scope, string product, string resource)
+        {
+            if (!Resource.Keys.Contains(scope))
+                throw new GeneralError("invalid scope", "Invalid scope name");
+            var foundScope = Resource[scope];
+            if(!foundScope.Keys.Contains(product))
+                throw new GeneralError("invalid product", "Invalid product name");
+            var foundProduct = foundScope[product];
+            if (!foundProduct.Keys.Contains(resource))
+                throw new GeneralError("invalid resource", "Invalid resource name");
+            var foundResource = foundProduct[resource];
+
+            return $"/{scope}/{product}{foundResource}";
+        }
+
+        /// <summary>
+        /// Replaces the :id pattern in the url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public string HandleId(string url, string resourceId)
+        {
+            if (resourceId != null)
+            {
+                if (resourceId == "")
+                    throw new GeneralError("invalid id", "Invalid resource ID");
+                if (resourceId == "*")
+                    resourceId = "%2A";
+                url = url.Replace(":id", resourceId);
+            }
+            return url;
+        }
+
+        /// <summary>
+        /// Get items using an iterator
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public IEnumerable<dynamic> ItemIterator(string url)
+        {
+            bool hasMore = true;
+            while (hasMore)
+            {
+                var results = SendSignedRequest(url);
+                hasMore = results.hasMore;
+                foreach (var item in results.items)
+                {
+                    yield return item;
+                }
+                SetQueryParameters(new Dictionary<string, string> { { "since", Convert.ToString(results.lastTimestamp) } });
+            }
+        }
+
+        /// <summary>
+        /// Retrieves resources of the specified type
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="product"></param>
+        /// <param name="resource"></param>
+        /// <param name="resourceId"></param>
+        /// <param name="iterate"></param>
+        /// <returns></returns>
+        public IEnumerable<dynamic> GetResource(string scope, string product, string resource, string resourceId=null, bool iterate=false)
+        {
+            var url = HandleId(CheckResourceValidity(scope, product, resource), resourceId);
+            if (iterate)
+                return ItemIterator(url);
+            else
+                return new List<dynamic> { SendSignedRequest(url) };
         }
 
         /// <summary>
