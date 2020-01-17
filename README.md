@@ -24,4 +24,4 @@ It makes use of the API to request the following products and resources:
 - Campaigns
 - Campaign results
 
-For more information on resources, authorization and available API calls, please visit our [documentation](https://developers.usabilla.com).
+For more information on resources, authorization and available API calls, please visit the [documentation](https://developers.usabilla.com).
