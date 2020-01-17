@@ -1,5 +1,5 @@
 # Usabilla API - C# Client
-The Usabilla Python client allows users to access data from their Usabilla accounts.
+The Usabilla C# client allows users to access data from their Usabilla accounts.
 It makes use of the API to request the following products and resources:
 
 ### Usabilla for Websites
