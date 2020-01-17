@@ -30,7 +30,7 @@ For more information on resources, authorization and available API calls, please
 ## Installing [NuGet Package](https://www.nuget.org/packages/Usabilla.NET/)
 Requires .NET Core 2.2
 ```
-PM> Install-Package Usabilla.NET -Version 1.0.0
+PM> Install-Package Usabilla.NET -Version 1.0.1
 ```
 
 ## How to Use
