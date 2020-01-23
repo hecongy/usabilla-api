@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <PackageId>Usabilla.NET</PackageId>
+    <PackageTags>usabilla</PackageTags>
+    <Description>Usabilla C# client that allows users to access data from their Usabilla accounts. Refer to the repo https://github.com/hecongy/usabilla-api for source code and how to use.</Description>
+	<Version>1.0.2</Version>
+	<Authors>hecongy</Authors>
   </PropertyGroup>
 
   <ItemGroup>

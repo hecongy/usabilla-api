@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamplesApps", "Examples\Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamplesWebsites", "Examples\ExamplesWebsites\ExamplesWebsites.csproj", "{68422C18-5ECC-4475-A0FF-64113129F3F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleEmail", "Examples\ExampleEmail\ExampleEmail.csproj", "{9BF3BF22-358E-46A9-BD64-E56B78A06784}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamplesEmail", "Examples\ExamplesEmail\ExamplesEmail.csproj", "{9BF3BF22-358E-46A9-BD64-E56B78A06784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BFBE1B65-4D3D-408D-8643-0192A3884D6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{BFBE1B65-4D3D-408D-8643-0192A3884D6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
